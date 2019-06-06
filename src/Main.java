@@ -25,7 +25,7 @@ public class Main {
             CSVWriter writer = new CSVWriter(outputfile);
 
             // adding header to csv
-            String[] header = { "Advertiser", "CPM", "End Date", "ID", "Name", "Start Date", "Total Clicks", "Total Conversions" };
+            String[] header = { "Advertiser", "CPM", "End Date", "ID", "Name", "Start Date", "Total Clicks", "Total Impressions" };
             writer.writeNext(header);
 
             // add data to csv
@@ -81,43 +81,43 @@ public class Main {
             org.json.JSONArray creArray = new org.json.JSONArray(creatives);
 
 
-            //initialize the hashmap with key=campaign id and value=clicks/comps in form of int array
+            //initialize the hashmap with key=campaign id and value=clicks/imps in form of int array
             HashMap<Integer, int[]> campaignMap = new HashMap<Integer, int[]>();
             String[][] data = new String[campArray.length()][8];
 
 
 
-            //go through the creatives, update clicks/comparisons in the map for their respective campaigns
+            //go through the creatives, update clicks/impressions in the map for their respective campaigns
             for(int i = 0; i<creArray.length(); i++) {
 
                 //make JSON object out of creative and set the key as its parentId
                 JSONObject object = creArray.getJSONObject(i);
                 int key = object.getInt("parentId");
 
-                //if key doesnt have click/comp array yet, initialize it and assign values from first creative
+                //if key doesnt have click/impression array yet, initialize it and assign values from first creative
                 if(campaignMap.containsKey(key)==false){
-                    int[] clickcomp = new int[2];
-                    clickcomp[0] = object.getInt("clicks");
-                    clickcomp[1] = object.getInt("conversions");
-                    campaignMap.put(key, clickcomp);
+                    int[] clickimp = new int[2];
+                    clickimp[0] = object.getInt("clicks");
+                    clickimp[1] = object.getInt("impressions");
+                    campaignMap.put(key, clickimp);
                 }
 
-                //otherwise, get the click/comparison array from the campaign and update values
+                //otherwise, get the click/imp array from the campaign and update values
                 else {
-                    int[] clickcomp = campaignMap.get(key);
-                    clickcomp[0] += object.getInt("clicks");
-                    clickcomp[1] += object.getInt("conversions");
+                    int[] clickimp = campaignMap.get(key);
+                    clickimp[0] += object.getInt("clicks");
+                    clickimp[1] += object.getInt("impressions");
 
                     //store updated values back into the map
-                    campaignMap.put(key, clickcomp);
+                    campaignMap.put(key, clickimp);
                 }
             }
 
 
-            //store the clicks and comps from the map to the data array
+            //store the clicks and imps from the map to the data array
             for(int i = 0; i<campArray.length(); i++){
                 JSONObject object = campArray.getJSONObject(i);
-                int [] clickcomp = campaignMap.get(object.getInt("id"));
+                int [] clickimp = campaignMap.get(object.getInt("id"));
 
                 //write data to data string array to be added to CSV later
                 data[i][0] = object.getString("advertiser");
@@ -126,8 +126,8 @@ public class Main {
                 data[i][3] = String.valueOf(object.getInt("id"));
                 data[i][4] = object.getString("name");
                 data[i][5] = object.getString("startDate");
-                data[i][6] = String.valueOf(clickcomp[0]);
-                data[i][7] = String.valueOf(clickcomp[1]);
+                data[i][6] = String.valueOf(clickimp[0]);
+                data[i][7] = String.valueOf(clickimp[1]);
             }
 
             //now we have all the data we need, return
